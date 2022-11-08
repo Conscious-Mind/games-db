@@ -2,6 +2,7 @@ package com.davidson.gamesdb.network
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
@@ -15,7 +16,7 @@ const val API_KEY = "d57042316ebf43d996b5f6427c117c37"
 
 const val DEFAULT_ORDER_BY = ""
 const val DEFAULT_PAGE_NUMBER = 1
-const val DEFAULT_PAGE_SIZE = 20
+const val DEFAULT_PAGE_SIZE = 10
 const val DEFAULT_SEARCH_QUERY = ""
 
 private val moshi = Moshi.Builder()
@@ -40,7 +41,7 @@ interface RawgGamesNetworkService {
         pageSize: Int = DEFAULT_PAGE_SIZE,
         @Query("search")
         searchQuery: String = DEFAULT_SEARCH_QUERY
-    ): Test
+    ): Response<Test>
 }
 
 object RawgNetwork {

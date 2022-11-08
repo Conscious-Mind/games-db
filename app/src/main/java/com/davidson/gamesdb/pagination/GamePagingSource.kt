@@ -1,47 +1,61 @@
 package com.davidson.gamesdb.pagination
 
-import android.graphics.pdf.PdfDocument.PageInfo
 import android.util.Log
-import android.widget.Toast
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.davidson.gamesdb.database.DatabaseGame
-import com.davidson.gamesdb.database.GamesDao
-import com.davidson.gamesdb.network.RawgNetwork
-import com.davidson.gamesdb.network.asDatabaseModel
-import com.davidson.gamesdb.repository.GamesRepository
+import com.davidson.gamesdb.domain.DomainGame
+import com.davidson.gamesdb.network.RawgGamesNetworkService
+import com.davidson.gamesdb.network.asDomainModel
 import kotlinx.coroutines.delay
 
-class GamePagingSource(private val repository: GamesRepository, val searchQuery: String = "") :
-    PagingSource<Int, DatabaseGame>() {
-    override fun getRefreshKey(state: PagingState<Int, DatabaseGame>): Int? {
+class GamePagingSource(
+    private val apiService: RawgGamesNetworkService,
+    val searchQuery: String = ""
+) :
+    PagingSource<Int, DomainGame>() {
+    override fun getRefreshKey(state: PagingState<Int, DomainGame>): Int? {
         return state.anchorPosition?.let {
             val anchorPage = state.closestPageToPosition(it)
             anchorPage?.prevKey?.plus(1) ?: anchorPage?.nextKey?.minus(1)
         }
     }
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, DatabaseGame> {
-        val page = params.key ?: 0
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, DomainGame> {
+        Log.e("PG_SRC", " Loading Data Step 1")
+        val page = params.key ?: 1
 
         return try {
-            val entities = repository.getGamesPaged(searchQuery, params.loadSize, page * params.loadSize)
-            Log.e("PG_SRC", entities.size.toString() + " Loading Data")
+            val response =
+                apiService.getAllGamesFromNetwork(pageNumber = page, searchQuery = searchQuery)
+            Log.e("PG_SRC", " Loading Data Step ")
 
-            if(page != 0)
-            {
-                delay(1000)
+            return if (response.isSuccessful) {
+                Log.e("PG_SRC", response.body()?.results?.size.toString() + " Loading Data")
+
+                val results = response.body()?.results
+
+                return if (results != null) {
+                    LoadResult.Page(
+                        data = results.asDomainModel(),
+                        prevKey = if (page == 1) null else page - 1,
+                        nextKey = if (results.isEmpty()) null else page + 1
+                    )
+                } else {
+                    LoadResult.Page(
+                        data = listOf<DomainGame>(),
+                        prevKey = page - 1,
+                        nextKey = null
+                    )
+                }
+
+            } else {
+                LoadResult.Error(Exception("Error in response"))
             }
-
-            LoadResult.Page(
-                data = entities,
-                prevKey = if (page == 0) null else page - 1,
-                nextKey = if (entities.isEmpty()) null else page + 1
-            )
-
         } catch (e: Exception) {
-            Log.e("ERROR_PAGING_SOURCE", e.message.toString())
             LoadResult.Error(e)
         }
+
+
+
     }
 }

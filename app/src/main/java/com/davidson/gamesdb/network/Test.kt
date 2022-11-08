@@ -1,7 +1,7 @@
 package com.davidson.gamesdb.network
 
 
-import com.davidson.gamesdb.database.DatabaseGame
+import com.davidson.gamesdb.domain.DomainGame
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -19,31 +19,31 @@ data class Test(
     @JsonClass(generateAdapter = true)
     data class Result(
         @Json(name = "background_image")
-        val backgroundImage: String, // https://media.rawg.io/media/games/456/456dea5e1c7e3cd07060c14e96612001.jpg
+        val backgroundImage: String?, // https://media.rawg.io/media/games/456/456dea5e1c7e3cd07060c14e96612001.jpg
         @Json(name = "dominant_color")
-        val dominantColor: String, // 0f0f0f
+        val dominantColor: String?, // 0f0f0f
         @Json(name = "genres")
         val genres: List<Genre>,
         @Json(name = "id")
         val id: Int, // 3498
         @Json(name = "metacritic")
-        val metacritic: Float, // 91
+        val metacritic: Float?, // 91
         @Json(name = "name")
-        val name: String, // Grand Theft Auto V
+        val name: String?, // Grand Theft Auto V
         @Json(name = "platforms")
         val platforms: List<Platform>,
         @Json(name = "rating")
-        val rating: Float, // 4.47
+        val rating: Float?, // 4.47
         @Json(name = "released")
-        val released: String, // 2013-09-17
+        val released: String?, // 2013-09-17
         @Json(name = "saturated_color")
-        val saturatedColor: String, // 0f0f0f
+        val saturatedColor: String?, // 0f0f0f
         @Json(name = "short_screenshots")
         val shortScreenshots: List<ShortScreenshot>,
         @Json(name = "tba")
-        val tba: Boolean, // false
+        val tba: Boolean?, // false
         @Json(name = "updated")
-        val updated: String, // 2022-11-05T15:53:53
+        val updated: String?, // 2022-11-05T15:53:53
     ) {
         @JsonClass(generateAdapter = true)
         data class Genre(
@@ -87,20 +87,36 @@ data class Test(
 }
 
 
-fun List<Test.Result>.asDatabaseModel(): List<DatabaseGame> {
+//fun List<Test.Result>.asDatabaseModel(): List<DatabaseGame> {
+//    return map {
+//        DatabaseGame(
+//            gameId = it.id,
+//            gameName = it.name ?: "Unavailable",
+//            gameBgImage = it.backgroundImage ?: "Unavailable",
+//            gameMetaCritic = it.metacritic ?: 0.0F,
+//            gameRating = it.rating ?: 0.0F,
+//            gameReleaseDate = it.released ?: "Unavailable",
+//            gameUpdatedDate = it.updated ?: "Unavailable",
+//            gameTba = it.tba ?: false,
+//            gameDominantColor = it.dominantColor ?: "Unavailable",
+//            gameSaturatedColor = it.saturatedColor ?: "Unavailable"
+//        )
+//    }
+//}
+
+fun List<Test.Result>.asDomainModel(): List<DomainGame> {
     return map {
-        DatabaseGame(
+        DomainGame(
             gameId = it.id,
-            gameName = it.name,
-            gameBgImage = it.backgroundImage,
-            gameMetaCritic = it.metacritic,
-            gameRating = it.rating,
-            gameReleaseDate = it.released,
-            gameUpdatedDate = it.updated,
-            gameTba = it.tba,
-            gameDominantColor = it.dominantColor,
-            gameSaturatedColor = it.saturatedColor
+            gameName = it.name ?: "Unavailable",
+            gameBgImage = it.backgroundImage ?: "Unavailable",
+            gameMetaCritic = it.metacritic ?: 0.0F,
+            gameRating = it.rating ?: 0.0F,
+            gameReleaseDate = it.released ?: "Unavailable",
+            gameUpdatedDate = it.updated ?: "Unavailable",
+            gameTba = it.tba ?: false,
+            gameDominantColor = it.dominantColor ?: "Unavailable",
+            gameSaturatedColor = it.saturatedColor ?: "Unavailable"
         )
     }
 }
-

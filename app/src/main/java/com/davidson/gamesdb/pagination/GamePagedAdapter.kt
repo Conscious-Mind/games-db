@@ -6,15 +6,15 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.davidson.gamesdb.adapter.bindImage
-import com.davidson.gamesdb.database.DatabaseGame
 import com.davidson.gamesdb.databinding.SingleGameItemBinding
+import com.davidson.gamesdb.domain.DomainGame
 
 class GamePagedAdapter :
-    PagingDataAdapter<DatabaseGame, GamePagedAdapter.ItemViewHolder>(DiffUtilItemCallBack()) {
+    PagingDataAdapter<DomainGame, GamePagedAdapter.ItemViewHolder>(DiffUtilItemCallBack()) {
 
     class ItemViewHolder private constructor(val binding: SingleGameItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(gameItem: DatabaseGame) {
+        fun bind(gameItem: DomainGame) {
             bindImage(binding.imageView, gameItem.gameBgImage)
             binding.textView.text = gameItem.gameName
             binding.textView2.text = gameItem.gameReleaseDate
@@ -38,12 +38,12 @@ class GamePagedAdapter :
     }
 }
 
-class DiffUtilItemCallBack : DiffUtil.ItemCallback<DatabaseGame>() {
-    override fun areItemsTheSame(oldItem: DatabaseGame, newItem: DatabaseGame): Boolean {
+class DiffUtilItemCallBack : DiffUtil.ItemCallback<DomainGame>() {
+    override fun areItemsTheSame(oldItem: DomainGame, newItem: DomainGame): Boolean {
         return oldItem.gameId == newItem.gameId
     }
 
-    override fun areContentsTheSame(oldItem: DatabaseGame, newItem: DatabaseGame): Boolean {
+    override fun areContentsTheSame(oldItem: DomainGame, newItem: DomainGame): Boolean {
         return oldItem == newItem
     }
 }
