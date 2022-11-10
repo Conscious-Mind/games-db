@@ -1,6 +1,5 @@
 package com.davidson.gamesdb.repository
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -9,8 +8,6 @@ import androidx.paging.liveData
 import com.davidson.gamesdb.domain.DomainGame
 import com.davidson.gamesdb.network.RawgNetwork
 import com.davidson.gamesdb.pagination.GamePagingSource
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class GamesRepository() {
 
@@ -31,7 +28,10 @@ class GamesRepository() {
 //        }
 
 
-    fun getGamesListInPagedFromNetwork(query: String): LiveData<PagingData<DomainGame>> {
+    fun getGamesListInPagedFromNetwork(
+        query: String,
+        maxPagesToGet: Int
+    ): LiveData<PagingData<DomainGame>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 10,
@@ -39,23 +39,23 @@ class GamesRepository() {
                 initialLoadSize = 10
             ),
             pagingSourceFactory = {
-                GamePagingSource(RawgNetwork.retrofitRawgNetworkService, query)
+                GamePagingSource(RawgNetwork.retrofitRawgNetworkService, query, maxPagesToGet)
             }).liveData
     }
 
-    suspend fun getGamesListFromNetwork(pageNumber: Int) {
-        withContext(Dispatchers.IO) {
-            try {
-                val gamesFromNetwork =
-                    RawgNetwork.retrofitRawgNetworkService.getAllGamesFromNetwork(pageNumber = pageNumber)
-
-//                database.GamesDao.insertAll(gamesFromNetwork.results.asDatabaseModel())
-//                refreshGamesListInRepo()
-            } catch (e: Exception) {
-                Log.e("ERROR_REPO", e.message.toString())
-            }
-        }
-    }
+//    suspend fun getGamesListFromNetwork(pageNumber: Int) {
+//        withContext(Dispatchers.IO) {
+//            try {
+//                val gamesFromNetwork =
+//                    RawgNetwork.retrofitRawgNetworkService.getAllGamesFromNetwork(pageNumber = pageNumber)
+//
+////                database.GamesDao.insertAll(gamesFromNetwork.results.asDatabaseModel())
+////                refreshGamesListInRepo()
+//            } catch (e: Exception) {
+//                Log.e("ERROR_REPO", e.message.toString())
+//            }
+//        }
+//    }
 
 
 }

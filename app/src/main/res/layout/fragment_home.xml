@@ -7,52 +7,81 @@
 
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.home.HomeFragment">
+        android:orientation="vertical">
 
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvHome"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="1dp"
-            android:layout_marginEnd="1dp"
-            android:clipToPadding="false"
-            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-            app:layout_constraintBottom_toBottomOf="parent"
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
-            app:spanCount="2"
-            tools:itemCount="16"
-            tools:listitem="@layout/single_game_item">
+            app:tabMode="fixed">
 
-        </androidx.recyclerview.widget.RecyclerView>
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="1" />
 
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Unavailable"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="2" />
 
-        <Button
-            android:id="@+id/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Button"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="3" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.tabs.TabLayout>
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/srlHome"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvHome"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal"
+                    android:padding="5dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:itemCount="16"
+                    tools:listitem="@layout/single_game_item" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvHome2"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal"
+                    android:padding="5dp"
+                    android:scrollbars="horizontal"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:itemCount="16"
+                    tools:listitem="@layout/single_game_item" />
+
+            </LinearLayout>
+
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+
+    </LinearLayout>
+
+
 </layout>

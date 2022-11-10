@@ -6,11 +6,11 @@ import androidx.paging.PagingState
 import com.davidson.gamesdb.domain.DomainGame
 import com.davidson.gamesdb.network.RawgGamesNetworkService
 import com.davidson.gamesdb.network.asDomainModel
-import kotlinx.coroutines.delay
 
 class GamePagingSource(
     private val apiService: RawgGamesNetworkService,
-    val searchQuery: String = ""
+    private val serQuery: String = "",
+    private val maxPagesToGet: Int = 4,
 ) :
     PagingSource<Int, DomainGame>() {
     override fun getRefreshKey(state: PagingState<Int, DomainGame>): Int? {
@@ -21,41 +21,59 @@ class GamePagingSource(
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, DomainGame> {
-        Log.e("PG_SRC", " Loading Data Step 1")
         val page = params.key ?: 1
+        var loadResult: LoadResult<Int, DomainGame>? = null
+        Log.e("loadState", "step 1")
 
-        return try {
+        if (serQuery == "returnEmpty#21") {
+            return LoadResult.Page(
+                data = listOf<DomainGame>(),
+                prevKey = null,
+                nextKey = null
+            )
+        }
+
+        try {
             val response =
-                apiService.getAllGamesFromNetwork(pageNumber = page, searchQuery = searchQuery)
-            Log.e("PG_SRC", " Loading Data Step ")
+                apiService.getAllGamesFromNetwork(
+                    pageNumber = page,
+                    searchQuery = serQuery,
+                    pageSize = params.loadSize
+                )
 
-            return if (response.isSuccessful) {
-                Log.e("PG_SRC", response.body()?.results?.size.toString() + " Loading Data")
+            Log.e("loadState", response.errorBody().toString())
+            println(response.errorBody().toString())
+
+            if (response.isSuccessful) {
+                Log.e("loadState", response.body()?.results?.size.toString() + " Loading Data")
 
                 val results = response.body()?.results
 
-                return if (results != null) {
+                loadResult = if (results != null) {
                     LoadResult.Page(
                         data = results.asDomainModel(),
                         prevKey = if (page == 1) null else page - 1,
-                        nextKey = if (results.isEmpty()) null else page + 1
+                        nextKey = if (page == maxPagesToGet) null else page + 1
                     )
                 } else {
                     LoadResult.Page(
                         data = listOf<DomainGame>(),
-                        prevKey = page - 1,
+                        prevKey = if (page == 1) null else page - 1,
                         nextKey = null
                     )
                 }
 
             } else {
-                LoadResult.Error(Exception("Error in response"))
+                loadResult = LoadResult.Error(Exception("Error in response"))
             }
         } catch (e: Exception) {
-            LoadResult.Error(e)
+            Log.e("loadState", "step 2")
+            println(e.message)
+
+            loadResult = LoadResult.Error(e)
         }
 
-
+        return loadResult ?: LoadResult.Error(Exception("no response"))
 
     }
 }
