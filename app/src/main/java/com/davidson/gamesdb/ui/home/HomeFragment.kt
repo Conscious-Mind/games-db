@@ -6,18 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.FragmentNavigatorExtras
+import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SnapHelper
 import com.davidson.gamesdb.databinding.FragmentHomeBinding
 import com.davidson.gamesdb.pagination.GamePagedAdapter
-import com.google.android.material.tabs.TabLayout
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -35,88 +34,88 @@ class HomeFragment : Fragment() {
         viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
         binding.lifecycleOwner = viewLifecycleOwner
 
-        val rvAdapter = GamePagedAdapter()
+        val rvAdapter1 = GamePagedAdapter().also {
+            it.setOnclickListenerR { imageView, gameItem ->
+                Toast.makeText(activity, gameItem.gameGistName, Toast.LENGTH_SHORT).show()
+                val extras = FragmentNavigatorExtras(imageView to "GameDetailed")
+                findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToDetailFragment(gameItem), extras)
+
+            }
+        }
+        val rvAdapter2 = GamePagedAdapter().also {
+            it.setOnclickListenerR { imageView, gameItem ->
+                Toast.makeText(activity, gameItem.gameGistName, Toast.LENGTH_SHORT).show()
+                val extras = FragmentNavigatorExtras(imageView to "GameDetailed")
+                findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToDetailFragment(gameItem), extras)
+
+            }
+        }
+        val rvAdapter3 = GamePagedAdapter().also {
+            it.setOnclickListenerR { imageView, gameItem ->
+                Toast.makeText(activity, gameItem.gameGistName, Toast.LENGTH_SHORT).show()
+                val extras = FragmentNavigatorExtras(imageView to "GameDetailed")
+                findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToDetailFragment(gameItem), extras)
+
+            }
+        }
         val srLayoutHome = binding.srlHome
-        val tabHome = binding.tabLayout
-        val snapHelper: SnapHelper = LinearSnapHelper()
+        val snapHelper1: SnapHelper = LinearSnapHelper()
+        val snapHelper2: SnapHelper = LinearSnapHelper()
+        val snapHelper3: SnapHelper = LinearSnapHelper()
+
+
 
         binding.rvHome.apply {
-            adapter = rvAdapter
-            snapHelper.attachToRecyclerView(this)
+            adapter = rvAdapter1
+            snapHelper1.attachToRecyclerView(this)
+        }
+        binding.rvHome2.apply {
+            adapter = rvAdapter2
+            snapHelper2.attachToRecyclerView(this)
         }
 
-        viewModel.gamesList.observe(viewLifecycleOwner) {
+        binding.rvHome3.apply {
+            adapter = rvAdapter3
+            snapHelper3.attachToRecyclerView(this)
+        }
+
+        viewModel.gameFromPc.observe(viewLifecycleOwner) {
             lifecycleScope.launch {
                 it?.let {
-                    Toast.makeText(context, "observed", Toast.LENGTH_SHORT).show()
                     Log.i("TAG", it.toString())
-                    rvAdapter.submitData(it)
+                    rvAdapter1.submitData(it)
+                }
+            }
+        }
+
+        viewModel.gameFromPs5.observe(viewLifecycleOwner) {
+            lifecycleScope.launch {
+                it?.let {
+                    Log.i("TAG", it.toString())
+                    rvAdapter2.submitData(it)
+                }
+            }
+        }
+        viewModel.gameFromMobile.observe(viewLifecycleOwner) {
+            lifecycleScope.launch {
+                it?.let {
+                    Log.i("TAG", it.toString())
+                    rvAdapter3.submitData(it)
                 }
             }
         }
 
 
         srLayoutHome.setOnRefreshListener {
-            viewModel.searchQuery.value = "aven"
-            rvAdapter.retry()
-            rvAdapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT
+            rvAdapter1.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT
             srLayoutHome.isRefreshing = false
         }
 
 
-        tabHome.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                when (tabHome.selectedTabPosition) {
-                    0 -> {
-//                        Toast.makeText(
-//                            context,
-//                            "${tabHome.selectedTabPosition}",
-//                            Toast.LENGTH_SHORT
-//                        ).show()
-//                        binding.rvHome.animate().rotationBy(360f).duration = 1000L
-                        viewModel.searchQuery.value = "aft"
-                        rvAdapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT
-                    }
-                    1 -> {
-//                        Toast.makeText(
-//                            context,
-//                            "${tabHome.selectedTabPosition}",
-//                            Toast.LENGTH_SHORT
-//                        ).show()
-//                        binding.rvHome.animate().rotationBy(360f).duration = 1000L
-                        viewModel.searchQuery.value = "f"
-                        rvAdapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT
-
-                    }
-                    2 -> {
-//                        Toast.makeText(
-//                            context,
-//                            "${tabHome.selectedTabPosition}",
-//                            Toast.LENGTH_SHORT
-//                        ).show()
-                        binding.rvHome.visibility = View.INVISIBLE
-//                        binding.rvHome.animate().rotationBy(360f).duration = 1000L
-                        viewModel.searchQuery.value = "t"
-                        rvAdapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT
-                        binding.rvHome.visibility = View.VISIBLE
-                    }
-                }
-            }
-
-            override fun onTabReselected(tab: TabLayout.Tab?) {
-                // Handle tab reselect
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-                // Handle tab unselect
-                viewModel.searchQuery.value = "returnEmpty#21"
-            }
-        })
 
 
 
-        rvAdapter.addLoadStateListener { loadStates ->
+        rvAdapter1.addLoadStateListener { loadStates ->
             when (loadStates.refresh) {
                 is LoadState.Loading -> {
                     Log.d("loadState", "Refresh - Loading")

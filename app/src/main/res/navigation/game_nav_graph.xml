@@ -9,10 +9,22 @@
         android:id="@+id/homeFragment"
         android:name="com.davidson.gamesdb.ui.home.HomeFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_detailFragment"
+            app:destination="@id/detailFragment" />
+    </fragment>
     <fragment
         android:id="@+id/detailFragment"
         android:name="com.davidson.gamesdb.ui.detailed.DetailFragment"
         android:label="fragment_detail"
-        tools:layout="@layout/fragment_detail" />
+        tools:layout="@layout/fragment_detail" >
+        <action
+            android:id="@+id/action_detailFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <argument
+            android:name="gameItemDetailed"
+            app:argType="com.davidson.gamesdb.domain.DomainGameGist"
+            app:nullable="true" />
+    </fragment>
 </navigation>

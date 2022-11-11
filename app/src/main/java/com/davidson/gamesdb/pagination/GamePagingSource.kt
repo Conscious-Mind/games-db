@@ -3,31 +3,33 @@ package com.davidson.gamesdb.pagination
 import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.davidson.gamesdb.domain.DomainGame
+import com.davidson.gamesdb.domain.DomainGameGist
 import com.davidson.gamesdb.network.RawgGamesNetworkService
-import com.davidson.gamesdb.network.asDomainModel
+import com.davidson.gamesdb.network.asDomainModelGist
 
 class GamePagingSource(
     private val apiService: RawgGamesNetworkService,
     private val serQuery: String = "",
     private val maxPagesToGet: Int = 4,
+    private val filterPlatform: Int = 4,
+    private val orderBy: String = "",
 ) :
-    PagingSource<Int, DomainGame>() {
-    override fun getRefreshKey(state: PagingState<Int, DomainGame>): Int? {
+    PagingSource<Int, DomainGameGist>() {
+    override fun getRefreshKey(state: PagingState<Int, DomainGameGist>): Int? {
         return state.anchorPosition?.let {
             val anchorPage = state.closestPageToPosition(it)
             anchorPage?.prevKey?.plus(1) ?: anchorPage?.nextKey?.minus(1)
         }
     }
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, DomainGame> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, DomainGameGist> {
         val page = params.key ?: 1
-        var loadResult: LoadResult<Int, DomainGame>? = null
+        var loadResult: LoadResult<Int, DomainGameGist>?
         Log.e("loadState", "step 1")
 
         if (serQuery == "returnEmpty#21") {
             return LoadResult.Page(
-                data = listOf<DomainGame>(),
+                data = listOf<DomainGameGist>(),
                 prevKey = null,
                 nextKey = null
             )
@@ -38,26 +40,33 @@ class GamePagingSource(
                 apiService.getAllGamesFromNetwork(
                     pageNumber = page,
                     searchQuery = serQuery,
-                    pageSize = params.loadSize
+                    pageSize = params.loadSize,
+                    platform = filterPlatform,
+                    orderBy = orderBy,
                 )
 
-            Log.e("loadState", response.errorBody().toString())
+            println("step 3")
+
+            Log.e("loadStateErr", response.errorBody().toString())
             println(response.errorBody().toString())
 
             if (response.isSuccessful) {
-                Log.e("loadState", response.body()?.results?.size.toString() + " Loading Data")
+                Log.e(
+                    "loadState",
+                    response.body()?.listOfNetworkGameGist?.size.toString() + " Loading Data"
+                )
 
-                val results = response.body()?.results
+                val results = response.body()?.listOfNetworkGameGist
 
                 loadResult = if (results != null) {
                     LoadResult.Page(
-                        data = results.asDomainModel(),
+                        data = results.asDomainModelGist(),
                         prevKey = if (page == 1) null else page - 1,
                         nextKey = if (page == maxPagesToGet) null else page + 1
                     )
                 } else {
                     LoadResult.Page(
-                        data = listOf<DomainGame>(),
+                        data = listOf<DomainGameGist>(),
                         prevKey = if (page == 1) null else page - 1,
                         nextKey = null
                     )

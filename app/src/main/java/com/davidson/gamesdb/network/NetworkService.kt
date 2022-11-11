@@ -18,6 +18,8 @@ const val DEFAULT_ORDER_BY = ""
 const val DEFAULT_PAGE_NUMBER = 1
 const val DEFAULT_PAGE_SIZE = 10
 const val DEFAULT_SEARCH_QUERY = ""
+const val DEFAULT_PLATFORM = 4
+
 
 private val moshi = Moshi.Builder()
     .add(KotlinJsonAdapterFactory())
@@ -35,13 +37,15 @@ interface RawgGamesNetworkService {
         apiKey: String = API_KEY,
         @Query("ordering")
         orderBy: String = DEFAULT_ORDER_BY,
+        @Query("platforms")
+        platform: Int = DEFAULT_PLATFORM,
         @Query("page")
         pageNumber: Int = DEFAULT_PAGE_NUMBER,
         @Query("page_size")
         pageSize: Int = DEFAULT_PAGE_SIZE,
         @Query("search")
         searchQuery: String = DEFAULT_SEARCH_QUERY
-    ): Response<Test>
+    ): Response<NetworkGameGistResponse>
 }
 
 object RawgNetwork {

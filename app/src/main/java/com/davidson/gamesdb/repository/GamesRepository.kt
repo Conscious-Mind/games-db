@@ -5,7 +5,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.liveData
-import com.davidson.gamesdb.domain.DomainGame
+import com.davidson.gamesdb.domain.DomainGameGist
 import com.davidson.gamesdb.network.RawgNetwork
 import com.davidson.gamesdb.pagination.GamePagingSource
 
@@ -30,8 +30,10 @@ class GamesRepository() {
 
     fun getGamesListInPagedFromNetwork(
         query: String,
-        maxPagesToGet: Int
-    ): LiveData<PagingData<DomainGame>> {
+        maxPagesToGet: Int,
+        platformToGet: Int,
+        orderBy: String,
+    ): LiveData<PagingData<DomainGameGist>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 10,
@@ -39,7 +41,7 @@ class GamesRepository() {
                 initialLoadSize = 10
             ),
             pagingSourceFactory = {
-                GamePagingSource(RawgNetwork.retrofitRawgNetworkService, query, maxPagesToGet)
+                GamePagingSource(RawgNetwork.retrofitRawgNetworkService, query, maxPagesToGet, platformToGet, orderBy)
             }).liveData
     }
 

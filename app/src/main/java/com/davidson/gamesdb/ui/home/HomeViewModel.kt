@@ -1,31 +1,27 @@
 package com.davidson.gamesdb.ui.home
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.bumptech.glide.Glide.init
-import com.davidson.gamesdb.domain.DomainGame
+import com.davidson.gamesdb.domain.DomainGameGist
 import com.davidson.gamesdb.repository.GamesRepository
+import com.davidson.gamesdb.util.Constants
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val gamesRepo = GamesRepository()
 
-
-    val searchQuery = MutableLiveData<String>()
-    var gamesList = Transformations.switchMap(searchQuery){ getWhatIWant(it,3)}
+    var gameFromPc = getWhatIWant( maxPages = 3, platform = Constants.PLATFORM_PC, orderBy = "-rating").cachedIn(viewModelScope)
+    var gameFromPs5 = getWhatIWant( maxPages = 3, platform = Constants.PLATFORM_PS5, orderBy = "-rating").cachedIn(viewModelScope)
+    var gameFromMobile = getWhatIWant( maxPages = 3, platform = Constants.PLATFORM_ANDROID, orderBy = "-rating").cachedIn(viewModelScope)
 
 
     init {
-        searchQuery.value = ""
+
     }
 
-    fun getWhatIWant(queryString: String, maxPages: Int): LiveData<PagingData<DomainGame>> {
-        return gamesRepo.getGamesListInPagedFromNetwork(queryString, maxPages).cachedIn(viewModelScope)
+    private fun getWhatIWant(queryString: String = "", maxPages: Int, platform: Int, orderBy: String = ""): LiveData<PagingData<DomainGameGist>> {
+        return gamesRepo.getGamesListInPagedFromNetwork(queryString, maxPages, platform, orderBy)
     }
 }
